@@ -2,6 +2,12 @@
 
 An AI-powered mental health support platform that provides real-time emotion analysis, voice interactions, and personalized therapeutic interventions.
 
+
+## Architecture 
+
+![image](https://github.com/user-attachments/assets/320fe666-0077-4c9a-b181-9a308103298f)
+
+
 ## Project Structure
 
 ```
