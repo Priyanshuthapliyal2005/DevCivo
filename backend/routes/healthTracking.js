@@ -4,6 +4,37 @@ const { spawn } = require('child_process');
 const path = require('path');
 const HealthReport = require('../models/HealthReport');
 const fs = require('fs');
+const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
+
+// Configure multer for PDF uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(__dirname, '../uploads');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueFilename = `${uuidv4()}-${file.originalname}`;
+    cb(null, uniqueFilename);
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'application/pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PDF files are allowed'));
+    }
+  },
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  }
+});
 
 // Helper function to run Python emotion report generator
 const generateEmotionReport = async (responses) => {
@@ -198,7 +229,14 @@ router.post('/', async (req, res) => {
   try {
     console.log('Received questionnaire data:', req.body);
     
-    // Validate and normalize input data
+    // Check if this is questionnaire data or PDF analysis data
+    if (req.body.insights && req.body.progress && req.body.recommendations) {
+      // This is PDF analysis data, pass it through
+      res.json(req.body);
+      return;
+    }
+    
+    // Otherwise treat as questionnaire data
     const validatedData = validateQuestionnaireData(req.body);
     const { user_id } = req.body;
 
@@ -464,6 +502,143 @@ router.get('/:userId', async (req, res) => {
   } catch (error) {
     console.error('Error fetching health history:', error);
     res.status(500).json({ error: error.message });
+  }
+});
+
+// PDF Analysis endpoint
+router.post('/pdf-analysis', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      throw new Error('No file uploaded');
+    }
+
+    const { user_id } = req.body;
+    if (!user_id) {
+      throw new Error('User ID is required');
+    }
+
+    // Path to the uploaded PDF
+    const pdfPath = req.file.path;
+
+    try {
+      // Call Python script for PDF analysis using the new processor
+      const pythonScriptPath = path.join(__dirname, '../../agent/agent/pdf_processor.py');
+      const pythonProcess = spawn('python', [pythonScriptPath, pdfPath]);
+
+      let result = '';
+      let error = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        const chunk = data.toString();
+        console.log('Python stdout chunk:', chunk);
+        result += chunk;
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        const chunk = data.toString();
+        console.log('Python stderr chunk:', chunk);
+        error += chunk;
+      });
+
+      await new Promise((resolve, reject) => {
+        pythonProcess.on('close', (code) => {
+          console.log('Python process exited with code:', code);
+          console.log('Final stdout:', result);
+          console.log('Final stderr:', error);
+
+          if (code !== 0) {
+            reject(new Error(`Python process failed with code ${code}: ${error}`));
+          } else {
+            try {
+              // Try to clean the output in case there's any extra output
+              const cleanedResult = result.trim().split('\n').pop();
+              console.log('Cleaned result:', cleanedResult);
+              resolve(JSON.parse(cleanedResult));
+            } catch (e) {
+              console.error('JSON parse error:', e);
+              console.error('Raw result:', result);
+              reject(e);
+            }
+          }
+        });
+      });
+
+      // Parse the analysis result
+      const analysis = JSON.parse(result);
+
+      // Create a health report from the analysis
+      const now = new Date();
+      const healthReport = new HealthReport({
+        userId: user_id,
+        questionnaireData: analysis.questionnaire_data,
+        emotionReport: analysis.emotion_report,
+        progressData: {
+          moodData: [{
+            date: now,
+            mood: analysis.questionnaire_data.mood,
+            anxiety: analysis.questionnaire_data.anxiety === 'none' ? 0 : 
+                    analysis.questionnaire_data.anxiety === 'mild' ? 3 : 
+                    analysis.questionnaire_data.anxiety === 'moderate' ? 6 : 9,
+            stress: 10 - analysis.questionnaire_data.mood
+          }],
+          sleepData: [{
+            date: now,
+            hours: 8, // Default value as it's not typically in medical reports
+            quality: analysis.questionnaire_data.sleep_quality
+          }],
+          activityData: [{
+            date: now,
+            exercise: analysis.questionnaire_data.self_care === 'extensive' ? 8 :
+                     analysis.questionnaire_data.self_care === 'moderate' ? 6 :
+                     analysis.questionnaire_data.self_care === 'minimal' ? 4 : 2,
+            meditation: analysis.questionnaire_data.self_care === 'extensive' ? 7 :
+                       analysis.questionnaire_data.self_care === 'moderate' ? 5 :
+                       analysis.questionnaire_data.self_care === 'minimal' ? 3 : 1,
+            social: analysis.questionnaire_data.social_interactions
+          }]
+        },
+        timestamp: now
+      });
+
+      // Save to database
+      await healthReport.save();
+
+      // Clean up the uploaded file
+      fs.unlinkSync(pdfPath);
+
+      // Format and send response
+      res.json({
+        insights: {
+          mainInsight: analysis.emotion_report.mainInsight,
+          riskAnalysis: analysis.emotion_report.riskAnalysis,
+          anxietyTrend: analysis.emotion_report.anxietyTrend,
+          stressResponse: analysis.emotion_report.stressResponse,
+          moodStability: analysis.emotion_report.moodStability,
+          patterns: analysis.emotion_report.patterns
+        },
+        progress: healthReport.progressData,
+        recommendations: {
+          articles: [],
+          videos: [],
+          wellness: {
+            lifestyle: [],
+            exercises: [],
+            mindfulness: [],
+            natural_remedies: []
+          }
+        }
+      });
+
+    } catch (error) {
+      // Clean up the uploaded file in case of error
+      if (fs.existsSync(pdfPath)) {
+        fs.unlinkSync(pdfPath);
+      }
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error processing PDF:', error);
+    res.status(400).json({ error: error.message });
   }
 });
 
