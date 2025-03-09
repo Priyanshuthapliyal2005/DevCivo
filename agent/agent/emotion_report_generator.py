@@ -3,7 +3,7 @@
 from emotion_questions import questions
 from emotion_analysis import EmotionAnalyzer
 import json
-from typing import Dict, List
+from typing import Dict, List, Any
 import os
 import sys
 
@@ -359,6 +359,137 @@ class EmotionReportGenerator:
         if any(entry['emotion'] == 'complicated_grief' for entry in analysis_report):
             disorder_indicators.append('Complicated Grief')
         return disorder_indicators
+
+def generate_emotion_report(responses: List[str]) -> Dict[str, Any]:
+    """
+    Generate an emotion report based on questionnaire responses.
+    
+    Args:
+        responses: List of responses from the questionnaire
+    
+    Returns:
+        Dictionary containing structured emotion analysis
+    """
+    try:
+        # Convert numeric responses to integers where applicable
+        mood = int(responses[0])
+        anxiety_level = responses[1]
+        sleep_quality = int(responses[2])
+        energy_level = int(responses[3])
+        physical_symptoms = responses[4]
+        concentration = int(responses[5])
+        self_care = responses[6]
+        social_score = int(responses[7])
+        intrusive_thoughts = responses[8]
+        optimism = int(responses[9])
+        stress_factors = responses[10]
+        coping_strategies = responses[11]
+        social_support = int(responses[12])
+        self_harm = responses[13]
+        professional_discussion = responses[14]
+
+        # Calculate risk analysis
+        risk_factors = {
+            'low': 0,
+            'moderate': 0,
+            'high': 0
+        }
+
+        # Assess mood-related risks
+        if mood <= 3:
+            risk_factors['high'] += 1
+        elif mood <= 5:
+            risk_factors['moderate'] += 1
+        else:
+            risk_factors['low'] += 1
+
+        # Assess anxiety-related risks
+        if anxiety_level == 'severe':
+            risk_factors['high'] += 1
+        elif anxiety_level == 'moderate':
+            risk_factors['moderate'] += 1
+        else:
+            risk_factors['low'] += 1
+
+        # Assess self-harm risks
+        if self_harm in ['active', 'severe']:
+            risk_factors['high'] += 2
+        elif self_harm == 'passive':
+            risk_factors['moderate'] += 1
+
+        # Calculate anxiety trend
+        anxiety_status = 'stable'
+        if anxiety_level == 'severe':
+            anxiety_status = 'increasing'
+        elif anxiety_level == 'none':
+            anxiety_status = 'decreasing'
+
+        # Calculate stress response
+        stress_status = 'stable'
+        if physical_symptoms == 'severe':
+            stress_status = 'worsening'
+        elif physical_symptoms == 'none':
+            stress_status = 'improving'
+
+        # Assess mood stability
+        mood_status = 'stable'
+        if intrusive_thoughts in ['moderate', 'severe'] or mood <= 4:
+            mood_status = 'fluctuating'
+
+        # Generate patterns list
+        patterns = []
+        if sleep_quality <= 4:
+            patterns.append("Poor sleep quality affecting daily functioning")
+        if energy_level <= 4:
+            patterns.append("Low energy levels impacting activities")
+        if concentration <= 4:
+            patterns.append("Difficulty maintaining focus and concentration")
+        if social_score <= 4:
+            patterns.append("Limited social engagement")
+        if self_care == 'minimal' or self_care == 'none':
+            patterns.append("Reduced self-care activities")
+
+        # Calculate emotion counts
+        emotions_count = {
+            "anxiety": {"none": 0, "mild": 0, "moderate": 0, "severe": 0}[anxiety_level],
+            "depression": 10 - mood,  # Inverse of mood score
+            "stress": {"none": 0, "mild": 1, "moderate": 2, "severe": 3}[physical_symptoms],
+            "irritability": 10 - concentration,  # Lower concentration often correlates with higher irritability
+            "fatigue": 10 - energy_level  # Inverse of energy level
+        }
+
+        return {
+            "mainInsight": {
+                "mood": mood,
+                "anxiety": {"none": 1, "mild": 2, "moderate": 3, "severe": 4}[anxiety_level],
+                "stress": {"none": 1, "mild": 2, "moderate": 3, "severe": 4}[physical_symptoms],
+                "sleep": sleep_quality
+            },
+            "riskAnalysis": {
+                "low": risk_factors['low'],
+                "moderate": risk_factors['moderate'],
+                "high": risk_factors['high']
+            },
+            "anxietyTrend": {
+                "status": anxiety_status,
+                "percentage": {"none": 0, "mild": 33, "moderate": 66, "severe": 100}[anxiety_level],
+                "detail": f"Anxiety levels are {anxiety_level}, showing a {anxiety_status} trend"
+            },
+            "stressResponse": {
+                "status": stress_status,
+                "percentage": {"none": 0, "mild": 33, "moderate": 66, "severe": 100}[physical_symptoms],
+                "detail": f"Physical stress symptoms are {physical_symptoms}, indicating {stress_status} stress management"
+            },
+            "moodStability": {
+                "status": mood_status,
+                "detail": f"Mood appears to be {mood_status} with a base level of {mood}/10"
+            },
+            "patterns": patterns,
+            "emotions_count": emotions_count
+        }
+
+    except Exception as e:
+        raise Exception(f"Error generating emotion report: {str(e)}")
 
 # Example usage
 if __name__ == "__main__":

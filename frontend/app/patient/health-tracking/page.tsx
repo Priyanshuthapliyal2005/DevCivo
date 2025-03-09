@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HealthQuestionnaire } from "@/components/patient/health-questionnaire";
 import { VoiceQuestionnaire } from "@/components/patient/voice-questionnaire";
+import { PdfQuestionnaire } from "@/components/patient/pdf-questionnaire";
 import { HealthInsights } from "@/components/patient/health-insights";
 import { ProgressCharts } from "@/components/patient/progress-charts";
 import Recommendations from "@/components/patient/recommendations";
@@ -90,22 +91,54 @@ interface HealthData {
         url: string;
       };
     }>;
-    wellness: Array<{
-      title: string;
-      type: string;
-      duration: string;
-      description: string;
-      action: {
-        label: string;
-        url: string;
-      };
-    }>;
+    wellness: {
+      lifestyle: Array<{
+        title: string;
+        type: string;
+        duration: string;
+        description: string;
+        action: {
+          label: string;
+          url: string;
+        };
+      }>;
+      exercises: Array<{
+        title: string;
+        type: string;
+        duration: string;
+        description: string;
+        action: {
+          label: string;
+          url: string;
+        };
+      }>;
+      mindfulness: Array<{
+        title: string;
+        type: string;
+        duration: string;
+        description: string;
+        action: {
+          label: string;
+          url: string;
+        };
+      }>;
+      natural_remedies: Array<{
+        title: string;
+        type: string;
+        duration: string;
+        description: string;
+        action: {
+          label: string;
+          url: string;
+        };
+      }>;
+    };
   };
 }
 
 export default function HealthTracking() {
   const [activeTab, setActiveTab] = useState("questionnaire");
-  const [assessmentType, setAssessmentType] = useState<"text" | "voice">("text");
+  const [assessmentType, setAssessmentType] = useState<"text" | "voice" | "pdf">("text");
   const [healthData, setHealthData] = useState<HealthData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
@@ -203,6 +236,12 @@ export default function HealthTracking() {
                 >
                   Voice Assessment
                 </Button>
+                <Button
+                  variant={assessmentType === "pdf" ? "default" : "outline"}
+                  onClick={() => setAssessmentType("pdf")}
+                >
+                  Upload Report
+                </Button>
               </div>
             </CardHeader>
             <CardContent>
@@ -211,8 +250,13 @@ export default function HealthTracking() {
                   onSubmit={handleQuestionnaireSubmit}
                   isLoading={loading}
                 />
-              ) : (
+              ) : assessmentType === "voice" ? (
                 <VoiceQuestionnaire 
+                  onSubmit={handleQuestionnaireSubmit}
+                  isLoading={loading}
+                />
+              ) : (
+                <PdfQuestionnaire
                   onSubmit={handleQuestionnaireSubmit}
                   isLoading={loading}
                 />

@@ -31,7 +31,12 @@ const questions = [
   "What specific things are causing you distress today? Please describe any concerns or worries."
 ];
 
-export function VoiceQuestionnaire() {
+interface VoiceQuestionnaireProps {
+  onSubmit: (data: any) => void;
+  isLoading: boolean;
+}
+
+export function VoiceQuestionnaire({ onSubmit, isLoading }: VoiceQuestionnaireProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(-1);
   const [responses, setResponses] = useState<QuestionnaireResponse[]>([]);
   const [isListening, setIsListening] = useState(false);
