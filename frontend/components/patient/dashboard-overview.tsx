@@ -5,9 +5,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, MessageSquare, Sparkles } from "lucide-react";
+import { CalendarDays, MessageSquare, Sparkles, Download } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { PDFDownloadLink, Document, Page, Text, View } from '@react-pdf/renderer';
 import localData from '../../../backend/data.json';
+
+const ReportPDF = ({ healthData, username }) => (
+  <Document>
+    <Page size="A4" style={{ padding: 30 }}>
+      <Text style={{ fontSize: 24, marginBottom: 20 }}>Mental Health Report</Text>
+      <Text>Patient: {username}</Text>
+      <Text>Date: {new Date().toLocaleDateString()}</Text>
+      
+      <View style={{ marginTop: 20 }}>
+        <Text>Mood Stability: {healthData.healthreports.mood}%</Text>
+        <Text>Anxiety Level: {healthData.healthreports.anxiety}%</Text>
+        <Text>Sleep Quality: {healthData.healthreports.sleep}%</Text>
+        <Text>Energy Level: {healthData.healthreports.energy}%</Text>
+        <Text>Concentration: {healthData.healthreports.concentration}%</Text>
+        <Text>Social Interaction: {healthData.healthreports.socialInteraction}%</Text>
+        <Text>Optimism: {healthData.healthreports.optimism}%</Text>
+      </View>
+    </Page>
+  </Document>
+);
 
 export function DashboardOverview() {
   const [username, setUsername] = useState<string>("");
@@ -250,6 +271,17 @@ export function DashboardOverview() {
             <CalendarDays className="h-4 w-4" />
             Book Consultation
           </Button>
+          <PDFDownloadLink
+            document={<ReportPDF healthData={healthData} username={username} />}
+            fileName={`mental-health-report-${new Date().toISOString().split('T')[0]}.pdf`}
+          >
+            {({ loading }) => (
+              <Button variant="outline" className="gap-2" disabled={loading}>
+                <Download className="h-4 w-4" />
+                {loading ? 'Generating...' : 'Download Report'}
+              </Button>
+            )}
+          </PDFDownloadLink>
           <Button className="gap-2" onClick={handleDailyCheckIn}>
             <Sparkles className="h-4 w-4" />
             Daily Check-in

@@ -2,76 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 🌿 Soft, calming color variables */
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --background: 200 80% 98%; /* Light pastel blue */
+  --foreground: 220 15% 20%; /* Deep muted gray-blue */
+  --card: 0 0% 100%;
+  --card-foreground: 220 15% 20%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 15% 20%;
+  --primary: 190 50% 45%; /* Muted teal */
+  --primary-foreground: 200 80% 98%;
+  --secondary: 160 50% 90%; /* Soft mint */
+  --secondary-foreground: 220 15% 20%;
+  --muted: 190 40% 92%; /* Gentle pastel cyan */
+  --muted-foreground: 220 15% 50%;
+  --accent: 280 50% 85%; /* Light lavender */
+  --accent-foreground: 200 80% 98%;
+  --destructive: 0 60% 60%;
+  --destructive-foreground: 200 80% 98%;
+  --border: 190 30% 85%;
+  --input: 190 30% 85%;
+  --ring: 190 50% 45%;
+  --radius: 0.75rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+/* 🌙 Dark Mode: Warmer, Low-Contrast Colors */
+.dark {
+  --background: 220 30% 15%; /* Deep muted navy */
+  --foreground: 200 80% 98%;
+  --card: 220 30% 15%;
+  --card-foreground: 200 80% 98%;
+  --popover: 220 30% 15%;
+  --popover-foreground: 200 80% 98%;
+  --primary: 180 45% 50%;
+  --primary-foreground: 220 30% 15%;
+  --secondary: 180 30% 25%;
+  --secondary-foreground: 200 80% 98%;
+  --muted: 180 30% 25%;
+  --muted-foreground: 180 10% 70%;
+  --accent: 280 40% 55%;
+  --accent-foreground: 200 80% 98%;
+  --destructive: 0 50% 40%;
+  --destructive-foreground: 200 80% 98%;
+  --border: 180 30% 25%;
+  --input: 180 30% 25%;
+  --ring: 190 50% 45%;
 }
 
-@layer base {
-  :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 221 83% 53%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 262 83% 58%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 221 83% 53%;
-    --chart-1: 221 83% 53%;
-    --chart-2: 262 83% 58%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-  }
-  .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 217 32% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 32% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 262 83% 58%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 32% 17%;
-    --input: 217 32% 17%;
-    --ring: 224 76% 48%;
-    --chart-1: 217 91% 60%;
-    --chart-2: 262 83% 58%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-  }
-}
-
+/* 🖌️ Apply styles */
 @layer base {
   * {
     @apply border-border;
@@ -82,24 +60,54 @@
   }
 }
 
+/* ✨ Typography: Gentle, Rounded, Readable */
 .font-poppins {
-  font-family: var(--font-poppins);
+  font-family: 'Poppins', sans-serif;
 }
 
 .font-inter {
-  font-family: var(--font-inter);
+  font-family: 'Inter', sans-serif;
 }
 
+/* 🎨 Gradient text for subtle contrast */
 .gradient-text {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
 }
 
-.hero-gradient {
-  background: radial-gradient(circle at 50% 50%, hsl(var(--primary) / 0.15), transparent 70%);
+/* 🌊 Soothing UI Animations */
+@keyframes gentle-floating {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
 }
 
+.floating {
+  animation: gentle-floating 4s ease-in-out infinite;
+}
+
+@keyframes soft-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  opacity: 0;
+  animation: soft-fade-in 1s ease-out forwards;
+}
+
+/* 🌟 Gentle Card Styles */
 .feature-card {
-  @apply relative overflow-hidden rounded-xl border border-border bg-card p-6 shadow-sm transition-all duration-300 hover:shadow-md;
+  @apply relative overflow-hidden rounded-xl border border-border bg-card p-6 shadow-md transition-all duration-300 hover:shadow-lg;
+  transition: box-shadow 0.3s ease-in-out;
 }
 
 .feature-card::before {
@@ -112,108 +120,74 @@
   background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)));
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.3s ease;
+  transition: transform 0.5s ease;
 }
 
 .feature-card:hover::before {
   transform: scaleX(1);
 }
 
-.floating {
-  animation: floating 3s ease-in-out infinite;
+/* 🌬️ Soothing Background Effects */
+.blob {
+  border-radius: 50%;
+  filter: blur(50px);
+  opacity: 0.3;
+  position: absolute;
+  z-index: -1;
 }
 
-.floating-delay-1 {
-  animation-delay: 0.5s;
-}
-
-.floating-delay-2 {
-  animation-delay: 1s;
-}
-
-@keyframes floating {
-  0% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
-}
-
-.fade-in {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeIn 0.8s ease-out forwards;
-}
-
-@keyframes fadeIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.staggered-fade-in > * {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.staggered-fade-in > *:nth-child(1) {
-  animation: fadeIn 0.8s ease-out 0.1s forwards;
-}
-
-.staggered-fade-in > *:nth-child(2) {
-  animation: fadeIn 0.8s ease-out 0.2s forwards;
-}
-
-.staggered-fade-in > *:nth-child(3) {
-  animation: fadeIn 0.8s ease-out 0.3s forwards;
-}
-
-.staggered-fade-in > *:nth-child(4) {
-  animation: fadeIn 0.8s ease-out 0.4s forwards;
-}
-
-.staggered-fade-in > *:nth-child(5) {
-  animation: fadeIn 0.8s ease-out 0.5s forwards;
-}
-
-.staggered-fade-in > *:nth-child(6) {
-  animation: fadeIn 0.8s ease-out 0.6s forwards;
-}
-
-.staggered-fade-in > *:nth-child(7) {
-  animation: fadeIn 0.8s ease-out 0.7s forwards;
-}
-
-.staggered-fade-in > *:nth-child(8) {
-  animation: fadeIn 0.8s ease-out 0.8s forwards;
-}
-
-.staggered-fade-in > *:nth-child(9) {
-  animation: fadeIn 0.8s ease-out 0.9s forwards;
-}
-
-.pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
+/* 🌀 Soft Pulse Effect */
+@keyframes soft-pulse {
   0%, 100% {
     opacity: 1;
   }
   50% {
-    opacity: 0.7;
+    opacity: 0.85;
   }
 }
 
-.blob {
-  border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.4;
-  position: absolute;
-  z-index: -1;
+.pulse {
+  animation: soft-pulse 3s ease-in-out infinite;
+}
+
+/* 🌿 Smooth Fade-in Staggered Effect */
+.staggered-fade-in > * {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.staggered-fade-in > *:nth-child(1) {
+  animation: soft-fade-in 1s ease-out 0.1s forwards;
+}
+
+.staggered-fade-in > *:nth-child(2) {
+  animation: soft-fade-in 1s ease-out 0.2s forwards;
+}
+
+.staggered-fade-in > *:nth-child(3) {
+  animation: soft-fade-in 1s ease-out 0.3s forwards;
+}
+
+.staggered-fade-in > *:nth-child(4) {
+  animation: soft-fade-in 1s ease-out 0.4s forwards;
+}
+
+.staggered-fade-in > *:nth-child(5) {
+  animation: soft-fade-in 1s ease-out 0.5s forwards;
+}
+
+.staggered-fade-in > *:nth-child(6) {
+  animation: soft-fade-in 1s ease-out 0.6s forwards;
+}
+
+.staggered-fade-in > *:nth-child(7) {
+  animation: soft-fade-in 1s ease-out 0.7s forwards;
+}
+
+.staggered-fade-in > *:nth-child(8) {
+  animation: soft-fade-in 1s ease-out 0.8s forwards;
+}
+
+.staggered-fade-in > *:nth-child(9) {
+  animation: soft-fade-in 1s ease-out 0.9s forwards;
 }

@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@react-pdf/renderer": "^4.3.0",
+    "date-fns": "^4.1.0",
+    "recharts": "^2.15.1",
+    "stripe": "^17.7.0"
+  }
+}

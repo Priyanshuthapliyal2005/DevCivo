@@ -43,22 +43,31 @@ class EmotionReportGenerator:
     def analyze_responses(self, responses: List[str]):
         """Analyze the emotional content of responses with enhanced precision."""
         try:
-            # Parse responses
-            mood = int(responses[0])
-            anxiety = responses[1].lower()
-            sleep_quality = int(responses[2])
-            energy_levels = int(responses[3])
-            physical_symptoms = responses[4].lower()
-            concentration = int(responses[5])
-            self_care = responses[6].lower()
-            social_interactions = int(responses[7])
-            intrusive_thoughts = responses[8].lower()
-            optimism = int(responses[9])
-            stress_factors = responses[10]
-            coping_strategies = responses[11]
-            social_support = int(responses[12])
-            self_harm = responses[13].lower()
-            professional_discussion = responses[14]
+            # Parse responses with safe integer conversion
+            def safe_int(value, default=5):
+                try:
+                    if value is None or value.lower() == 'none':
+                        return default
+                    return int(value)
+                except (ValueError, TypeError):
+                    return default
+
+            # Parse responses with safe conversion
+            mood = safe_int(responses[0])
+            anxiety = responses[1].lower() if responses[1] else 'none'
+            sleep_quality = safe_int(responses[2])
+            energy_levels = safe_int(responses[3])
+            physical_symptoms = responses[4].lower() if responses[4] else 'none'
+            concentration = safe_int(responses[5])
+            self_care = responses[6].lower() if responses[6] else 'none'
+            social_interactions = safe_int(responses[7])
+            intrusive_thoughts = responses[8].lower() if responses[8] else 'none'
+            optimism = safe_int(responses[9])
+            stress_factors = responses[10] if responses[10] else ''
+            coping_strategies = responses[11] if responses[11] else ''
+            social_support = safe_int(responses[12])
+            self_harm = responses[13].lower() if responses[13] else 'none'
+            professional_discussion = responses[14] if responses[14] else ''
 
             # Enhanced emotion mapping with detailed analysis
             emotions_count = {}
@@ -371,22 +380,31 @@ def generate_emotion_report(responses: List[str]) -> Dict[str, Any]:
         Dictionary containing structured emotion analysis
     """
     try:
-        # Convert numeric responses to integers where applicable
-        mood = int(responses[0])
-        anxiety_level = responses[1]
-        sleep_quality = int(responses[2])
-        energy_level = int(responses[3])
-        physical_symptoms = responses[4]
-        concentration = int(responses[5])
-        self_care = responses[6]
-        social_score = int(responses[7])
-        intrusive_thoughts = responses[8]
-        optimism = int(responses[9])
-        stress_factors = responses[10]
-        coping_strategies = responses[11]
-        social_support = int(responses[12])
-        self_harm = responses[13]
-        professional_discussion = responses[14]
+        # Helper function for safe integer conversion
+        def safe_int(value, default=5):
+            try:
+                if value is None or str(value).lower() == 'none':
+                    return default
+                return int(value)
+            except (ValueError, TypeError):
+                return default
+
+        # Convert numeric responses to integers where applicable using safe conversion
+        mood = safe_int(responses[0])
+        anxiety_level = str(responses[1]).lower() if responses[1] else 'none'
+        sleep_quality = safe_int(responses[2])
+        energy_level = safe_int(responses[3])
+        physical_symptoms = str(responses[4]).lower() if responses[4] else 'none'
+        concentration = safe_int(responses[5])
+        self_care = str(responses[6]).lower() if responses[6] else 'none'
+        social_score = safe_int(responses[7])
+        intrusive_thoughts = str(responses[8]).lower() if responses[8] else 'none'
+        optimism = safe_int(responses[9])
+        stress_factors = responses[10] if responses[10] else ''
+        coping_strategies = responses[11] if responses[11] else ''
+        social_support = safe_int(responses[12])
+        self_harm = str(responses[13]).lower() if responses[13] else 'none'
+        professional_discussion = responses[14] if responses[14] else ''
 
         # Calculate risk analysis
         risk_factors = {
