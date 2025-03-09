@@ -1,4 +1,4 @@
-# MindGuard
+# DevCivo MindGuard
 
 An AI-powered mental health support platform that provides real-time emotion analysis, voice interactions, and personalized therapeutic interventions.
 
