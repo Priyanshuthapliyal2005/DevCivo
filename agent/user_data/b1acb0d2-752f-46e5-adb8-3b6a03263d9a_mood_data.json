@@ -80,6 +80,56 @@
       "intensity": 0.9,
       "context": "my girlfriend has broken up with me and i am feeling so much stress and now feeling to suicide",
       "triggers": []
+    },
+    {
+      "timestamp": "2025-03-13T04:26:59.943061",
+      "date": "2025-03-13",
+      "time": "04:26",
+      "mood": "neutral",
+      "valence": 0.0,
+      "intensity": 0.1,
+      "context": "how can i improve my sleep quality?",
+      "triggers": []
+    },
+    {
+      "timestamp": "2025-03-13T04:27:05.550292",
+      "date": "2025-03-13",
+      "time": "04:27",
+      "mood": "neutral",
+      "valence": 0.0,
+      "intensity": 0.1,
+      "context": "can you suggest some self-care activities?",
+      "triggers": []
+    },
+    {
+      "timestamp": "2025-03-13T04:27:07.055633",
+      "date": "2025-03-13",
+      "time": "04:27",
+      "mood": "neutral",
+      "valence": 0.0,
+      "intensity": 0.1,
+      "context": "can you suggest some self-care activities?",
+      "triggers": []
+    },
+    {
+      "timestamp": "2025-03-13T04:31:07.033869",
+      "date": "2025-03-13",
+      "time": "04:31",
+      "mood": "neutral",
+      "valence": 0.0,
+      "intensity": 0.1,
+      "context": "how do i recognize signs of burnout?",
+      "triggers": []
+    },
+    {
+      "timestamp": "2025-03-13T04:31:16.618031",
+      "date": "2025-03-13",
+      "time": "04:31",
+      "mood": "neutral",
+      "valence": 0.0,
+      "intensity": 0.1,
+      "context": "what us yoga",
+      "triggers": []
     }
   ],
   "insights": [],

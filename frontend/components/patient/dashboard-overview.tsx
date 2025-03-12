@@ -7,28 +7,8 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { CalendarDays, MessageSquare, Sparkles, Download } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { PDFDownloadLink, Document, Page, Text, View } from '@react-pdf/renderer';
+import { MentalHealthReportGenerator } from "../../services/MentalHealthReportGenerator";
 import localData from '../../../backend/data.json';
-
-const ReportPDF = ({ healthData, username }) => (
-  <Document>
-    <Page size="A4" style={{ padding: 30 }}>
-      <Text style={{ fontSize: 24, marginBottom: 20 }}>Mental Health Report</Text>
-      <Text>Patient: {username}</Text>
-      <Text>Date: {new Date().toLocaleDateString()}</Text>
-      
-      <View style={{ marginTop: 20 }}>
-        <Text>Mood Stability: {healthData.healthreports.mood}%</Text>
-        <Text>Anxiety Level: {healthData.healthreports.anxiety}%</Text>
-        <Text>Sleep Quality: {healthData.healthreports.sleep}%</Text>
-        <Text>Energy Level: {healthData.healthreports.energy}%</Text>
-        <Text>Concentration: {healthData.healthreports.concentration}%</Text>
-        <Text>Social Interaction: {healthData.healthreports.socialInteraction}%</Text>
-        <Text>Optimism: {healthData.healthreports.optimism}%</Text>
-      </View>
-    </Page>
-  </Document>
-);
 
 export function DashboardOverview() {
   const [username, setUsername] = useState<string>("");
@@ -45,6 +25,7 @@ export function DashboardOverview() {
       optimism: 0
     }
   });
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -248,6 +229,104 @@ export function DashboardOverview() {
     }
   };
 
+  const handleDownloadReport = async () => {
+    try {
+      // Get token from localStorage
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found. Please log in again.');
+      }
+
+      // Get the latest entry from local data
+      const latestEntry = localData[localData.length - 1];
+      if (!latestEntry) {
+        throw new Error('No health data found. Please complete a health assessment first.');
+      }
+
+      console.log('Using local data:', latestEntry);
+
+      // Transform the data into the expected format
+      const mentalHealthData = [{
+        input: {
+          mood: latestEntry.input.mood,
+          anxiety: latestEntry.input.anxiety,
+          sleep_quality: latestEntry.input.sleep_quality,
+          energy_levels: latestEntry.input.energy_levels,
+          concentration: latestEntry.input.concentration,
+          social_interactions: latestEntry.input.social_interactions,
+          optimism: latestEntry.input.optimism,
+          self_care: latestEntry.input.self_care,
+          self_harm: latestEntry.input.self_harm,
+          intrusive_thoughts: latestEntry.input.intrusive_thoughts,
+          physical_symptoms: latestEntry.input.physical_symptoms,
+          stress_factors: latestEntry.input.stress_factors,
+          coping_strategies: latestEntry.input.coping_strategies,
+          discuss_professional: latestEntry.input.discuss_professional,
+          social_support: latestEntry.input.social_support
+        },
+        output: {
+          summary: {
+            emotions_count: latestEntry.output.summary.emotions_count,
+            average_confidence: latestEntry.output.summary.average_confidence,
+            average_valence: latestEntry.output.summary.average_valence,
+            crisis_count: latestEntry.output.summary.crisis_count,
+            risk_factors: latestEntry.output.summary.risk_factors
+          },
+          disorder_indicators: latestEntry.output.disorder_indicators
+        },
+        timestamp: new Date().toISOString()
+      }];
+
+      // Generate insights from the data
+      const insights = [{
+        category: 'Mental Health Analysis',
+        description: `Analysis based on ${mentalHealthData.length} data points`,
+        severity: latestEntry.input.intrusive_thoughts === 'severe' || latestEntry.output.summary.crisis_count > 0 ? 'high' : 'medium',
+        recommendations: [
+          ...latestEntry.output.summary.risk_factors.map(factor => `Address ${factor.toLowerCase()}`),
+          latestEntry.input.self_care === 'extensive' ? 'Maintain current self-care routine' : 'Consider increasing self-care activities',
+          latestEntry.input.discuss_professional === 'yes' ? 'Continue professional consultation' : 'Consider professional consultation'
+        ]
+      }];
+
+      console.log('Generating detailed report...');
+      // Generate detailed report
+      const detailedReport = MentalHealthReportGenerator.generateDetailedReport(
+        mentalHealthData,
+        insights,
+        {
+          patientInfo: {
+            name: username !== 'Guest' ? username : undefined,
+            dateOfAssessment: new Date().toISOString().split('T')[0],
+            assessmentType: 'Routine Check'
+          }
+        }
+      );
+      console.log('Generated report:', detailedReport);
+
+      console.log('Generating PDF...');
+      // Generate and download PDF
+      const pdfBlob = MentalHealthReportGenerator.generatePDF(detailedReport);
+      const url = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      const date = new Date().toISOString().split('T')[0];
+      link.download = `mental-health-report-${date}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      console.log('PDF generated and download initiated');
+    } catch (error) {
+      console.error('Error generating report:', error);
+      if (error instanceof Error) {
+        console.error('Error details:', error.message);
+        console.error('Error stack:', error.stack);
+      }
+      alert(error instanceof Error ? error.message : 'Failed to generate report. Please try again.');
+    }
+  };
+
   // Add this before the return statement
   useEffect(() => {
     console.log('Rendered health data:', healthData.healthreports);
@@ -271,17 +350,14 @@ export function DashboardOverview() {
             <CalendarDays className="h-4 w-4" />
             Book Consultation
           </Button>
-          <PDFDownloadLink
-            document={<ReportPDF healthData={healthData} username={username} />}
-            fileName={`mental-health-report-${new Date().toISOString().split('T')[0]}.pdf`}
+          <Button 
+            variant="outline" 
+            className="gap-2" 
+            onClick={handleDownloadReport}
           >
-            {({ loading }) => (
-              <Button variant="outline" className="gap-2" disabled={loading}>
-                <Download className="h-4 w-4" />
-                {loading ? 'Generating...' : 'Download Report'}
-              </Button>
-            )}
-          </PDFDownloadLink>
+            <Download className="h-4 w-4" />
+            Download Report
+          </Button>
           <Button className="gap-2" onClick={handleDailyCheckIn}>
             <Sparkles className="h-4 w-4" />
             Daily Check-in

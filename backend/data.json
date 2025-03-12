@@ -660,5 +660,42 @@
             },
             "disorder_indicators": []
         }
+    },
+    {
+        "input": {
+            "user_id": "b1acb0d2-752f-46e5-adb8-3b6a03263d9a",
+            "mood": 7,
+            "anxiety": "none",
+            "sleep_quality": 10,
+            "energy_levels": 5,
+            "physical_symptoms": "none",
+            "concentration": 10,
+            "self_care": "extensive",
+            "social_interactions": 10,
+            "intrusive_thoughts": "severe",
+            "optimism": 10,
+            "stress_factors": "nothing just the some stress of future and placements",
+            "coping_strategies": "just avoid overthinking",
+            "social_support": 10,
+            "self_harm": "none",
+            "discuss_professional": "no"
+        },
+        "output": {
+            "summary": {
+                "emotions_count": {
+                    "content": 2,
+                    "stable": 1,
+                    "calm": 2,
+                    "relaxed": 1
+                },
+                "average_confidence": 0.7,
+                "average_valence": 0.7,
+                "crisis_count": 1,
+                "risk_factors": [
+                    "Persistent intrusive thoughts"
+                ]
+            },
+            "disorder_indicators": []
+        }
     }
 ]

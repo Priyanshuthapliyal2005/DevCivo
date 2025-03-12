@@ -26,6 +26,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { CalendarClock, Clock, Filter, MapPin, Video } from "lucide-react";
+import { formatTime } from "@/utils/time-format";
 
 export default function AppointmentsPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -37,7 +38,7 @@ export default function AppointmentsPage() {
       patientName: "Sarah Johnson",
       patientImage: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=128&h=128&auto=format&fit=crop",
       date: "Today",
-      time: "9:00 AM",
+      time: "9:00 am",
       status: "confirmed",
       type: "in-person",
       location: "Main Office",
@@ -48,7 +49,7 @@ export default function AppointmentsPage() {
       patientName: "Michael Brown",
       patientImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=128&h=128&auto=format&fit=crop",
       date: "Today",
-      time: "11:30 AM",
+      time: "11:30 am",
       status: "confirmed",
       type: "video",
       location: "Virtual",
@@ -59,7 +60,7 @@ export default function AppointmentsPage() {
       patientName: "Emily Davis",
       patientImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=128&h=128&auto=format&fit=crop",
       date: "Tomorrow",
-      time: "2:00 PM",
+      time: "2:00 pm",
       status: "pending",
       type: "in-person",
       location: "Main Office",
@@ -70,7 +71,7 @@ export default function AppointmentsPage() {
       patientName: "David Wilson",
       patientImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=128&h=128&auto=format&fit=crop",
       date: "Tomorrow",
-      time: "4:30 PM",
+      time: "4:30 pm",
       status: "confirmed",
       type: "video",
       location: "Virtual",
@@ -84,7 +85,7 @@ export default function AppointmentsPage() {
       patientName: "Jennifer Lee",
       patientImage: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=128&h=128&auto=format&fit=crop",
       date: "Yesterday",
-      time: "10:00 AM",
+      time: "10:00 am",
       status: "completed",
       type: "in-person",
       location: "Main Office",
@@ -95,7 +96,7 @@ export default function AppointmentsPage() {
       patientName: "Robert Taylor",
       patientImage: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=128&h=128&auto=format&fit=crop",
       date: "Yesterday",
-      time: "3:30 PM",
+      time: "3:30 pm",
       status: "completed",
       type: "video",
       location: "Virtual",
@@ -106,7 +107,7 @@ export default function AppointmentsPage() {
       patientName: "Lisa Anderson",
       patientImage: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=128&h=128&auto=format&fit=crop",
       date: "Aug 15, 2025",
-      time: "1:00 PM",
+      time: "1:00 pm",
       status: "cancelled",
       type: "in-person",
       location: "Main Office",
@@ -173,7 +174,7 @@ export default function AppointmentsPage() {
                         <p className="font-medium">{appointment.patientName}</p>
                         <div className="flex items-center text-sm text-muted-foreground mt-1">
                           <Clock className="mr-1 h-3 w-3" />
-                          <span>{appointment.date} at {appointment.time}</span>
+                          <span>{appointment.date} at {formatTime(appointment.time)}</span>
                           {appointment.type === "video" ? (
                             <Video className="ml-3 mr-1 h-3 w-3" />
                           ) : (
@@ -218,7 +219,7 @@ export default function AppointmentsPage() {
                         <p className="font-medium">{appointment.patientName}</p>
                         <div className="flex items-center text-sm text-muted-foreground mt-1">
                           <Clock className="mr-1 h-3 w-3" />
-                          <span>{appointment.date} at {appointment.time}</span>
+                          <span>{appointment.date} at {formatTime(appointment.time)}</span>
                           {appointment.type === "video" ? (
                             <Video className="ml-3 mr-1 h-3 w-3" />
                           ) : (

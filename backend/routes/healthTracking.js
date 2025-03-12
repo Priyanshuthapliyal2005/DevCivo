@@ -407,6 +407,60 @@ router.post('/', async (req, res) => {
   }
 });
 
+// Get latest health data for a user (MUST be before /:userId route)
+router.get('/latest', async (req, res) => {
+  try {
+    const user_id = req.query.userId;
+    if (!user_id) {
+      throw new Error('User ID is required');
+    }
+
+    // Get the most recent report for the user
+    const latestReport = await HealthReport.findOne({ userId: user_id })
+      .sort({ timestamp: -1 })
+      .exec();
+
+    if (!latestReport) {
+      return res.status(404).json({ error: 'No health data found' });
+    }
+
+    // Format response for frontend
+    res.json({
+      entries: {
+        questionnaireData: latestReport.questionnaireData,
+        timestamp: latestReport.timestamp
+      },
+      insights: {
+        mainInsight: latestReport.emotionReport.summary.emotions_count,
+        riskAnalysis: {
+          low: latestReport.emotionReport.disorder_indicators.filter(i => i.toLowerCase().includes('mild')).length,
+          moderate: latestReport.emotionReport.disorder_indicators.filter(i => i.toLowerCase().includes('moderate')).length,
+          high: latestReport.emotionReport.disorder_indicators.filter(i => i.toLowerCase().includes('severe')).length
+        },
+        anxietyTrend: {
+          status: latestReport.questionnaireData.anxiety === 'moderate' || latestReport.questionnaireData.anxiety === 'severe' ? 'increasing' : 'stable',
+          percentage: latestReport.emotionReport.summary.average_confidence * 100,
+          detail: `Based on your responses, your anxiety level appears to be ${latestReport.questionnaireData.anxiety}`
+        },
+        stressResponse: {
+          status: latestReport.questionnaireData.self_care === 'moderate' || latestReport.questionnaireData.self_care === 'extensive' ? 'improving' : 'worsening',
+          percentage: Math.round((latestReport.emotionReport.summary.average_valence || latestReport.questionnaireData.mood / 10) * 100),
+          detail: `Your stress management through ${latestReport.questionnaireData.self_care} self-care activities shows ${latestReport.questionnaireData.self_care === 'moderate' || latestReport.questionnaireData.self_care === 'extensive' ? 'improvement' : 'room for improvement'}`
+        },
+        moodStability: {
+          status: latestReport.questionnaireData.mood >= 5 ? 'stable' : 'fluctuating',
+          detail: `Your mood rating of ${latestReport.questionnaireData.mood}/10 indicates ${latestReport.questionnaireData.mood >= 5 ? 'stable mood' : 'mood fluctuations'}`
+        },
+        patterns: latestReport.emotionReport.disorder_indicators || []
+      },
+      progress: latestReport.progressData
+    });
+  } catch (error) {
+    console.error('Error fetching latest health data:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Get health history for a user
 router.get('/:userId', async (req, res) => {
   try {
